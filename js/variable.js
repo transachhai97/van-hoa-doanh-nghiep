@@ -1,4 +1,3 @@
-// Grid dimensions
 const GRID_COLUMNS = 10;
 const GRID_ROWS = 8;
 

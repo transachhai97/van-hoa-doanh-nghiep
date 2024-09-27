@@ -44,4 +44,23 @@ function setTokenFromStorage() {
     return false;
 }
 
-Object.assign(window, { api, login, setTokenFromStorage });
+async function getRecentResults() {
+    const params = {
+        userId: localStorage.getItem('uuid'),
+        resultType: 'LIVE_GAME',
+        searchMode: 'HOST',
+        limit: 5,
+        orderBy: 'time',
+        reverse: true
+    };
+
+    try {
+        const { data } = await api.get('/results/browse', { params });
+        return data;
+    } catch (error) {
+        console.error('Error fetching recent results:', error);
+        return null;
+    }
+}
+
+Object.assign(window, { api, login, setTokenFromStorage, getRecentResults });

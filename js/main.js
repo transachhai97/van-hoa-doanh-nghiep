@@ -1,35 +1,35 @@
-$(document).ready(async function() {
-    // Try to set token from storage first
+$(async function() {
     if (!setTokenFromStorage()) {
-        // If no token in storage, try to login
         await login();
     }
 
     const gridContainer = $('#grid-container');
     
-    // Set grid template
     gridContainer.css({
         'grid-template-columns': `repeat(${GRID_COLUMNS}, 1fr)`,
         'grid-template-rows': `repeat(${GRID_ROWS}, 1fr)`
     });
     
-    // Create grid
-    for (let i = 0; i < GRID_COLUMNS * GRID_ROWS; i++) {
-        gridContainer.append('<div class="grid-item"></div>');
-    }
+    gridContainer.html(Array(GRID_COLUMNS * GRID_ROWS).fill('<div class="grid-item"></div>').join(''));
 
-    // Make the grid responsive
     function resizeGrid() {
-        const containerWidth = gridContainer.width();
-        const containerHeight = gridContainer.height();
+        const { width: containerWidth, height: containerHeight } = gridContainer[0].getBoundingClientRect();
         const cellWidth = containerWidth / GRID_COLUMNS;
         const cellHeight = containerHeight / GRID_ROWS;
 
         $('.grid-item').css({
-            'width': cellWidth + 'px',
-            'height': cellHeight + 'px'
+            width: `${cellWidth}px`,
+            height: `${cellHeight}px`
         });
     }
 
     $(window).on('resize', resizeGrid).trigger('resize');
+
+    try {
+        const recentResults = await getRecentResults();
+        console.log('Recent results:', recentResults);
+        // TODO: Process and display the recent results
+    } catch (error) {
+        console.error('Error getting recent results:', error);
+    }
 });
