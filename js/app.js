@@ -78,11 +78,22 @@ const kahoot = {
 
         try {
             const { data } = await api.get(url, { params });
+            const convertedData = this.convertAndLogData(data.entities);
+            console.log('Converted data:', convertedData);
             return data;
         } catch (error) {
             console.error('Error fetching report details:', error);
             return null;
         }
+    },
+
+    convertAndLogData(entities) {
+        return entities.map(entity => ({
+            nickname: entity.controller.nickname,
+            answersCount: entity.reportData.answersCount,
+            unansweredCount: entity.reportData.unansweredCount,
+            correctAnswersCount: entity.reportData.correctAnswersCount
+        }));
     }
 };
 
