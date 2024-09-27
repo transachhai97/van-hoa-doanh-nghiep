@@ -88,12 +88,27 @@ const kahoot = {
     },
 
     convertAndLogData(entities) {
-        return entities.map(entity => ({
+        const convertedData = entities.map((entity, index) => ({
             nickname: entity.controller.nickname,
             answersCount: entity.reportData.answersCount,
             unansweredCount: entity.reportData.unansweredCount,
             correctAnswersCount: entity.reportData.correctAnswersCount
         }));
+
+        convertedData.forEach((data, index) => {
+            const $gridItem = $(`#grid-item-${index}`);
+            if ($gridItem.length) {
+                $gridItem.html(`
+                    <div class="player-info">
+                        <p class="nickname">${data.nickname}</p>
+                        <p class="score">Score: ${data.correctAnswersCount}</p>
+                    </div>
+                `);
+            }
+        });
+
+        console.log('Converted data:', convertedData);
+        return convertedData;
     }
 };
 
@@ -104,7 +119,9 @@ const ui = {
             'grid-template-columns': `repeat(${GRID_COLUMNS}, 1fr)`,
             'grid-template-rows': `repeat(${GRID_ROWS}, 1fr)`
         });
-        $gridContainer.html(Array(GRID_COLUMNS * GRID_ROWS).fill('<div class="grid-item"></div>').join(''));
+        $gridContainer.html(Array(GRID_COLUMNS * GRID_ROWS).fill('')
+            .map((_, index) => `<div id="grid-item-${index}" class="grid-item"></div>`)
+            .join(''));
     },
 
     resizeGrid() {
