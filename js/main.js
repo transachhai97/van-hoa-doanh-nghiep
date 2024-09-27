@@ -41,7 +41,7 @@ $(async function() {
             
             recentResults.entities.forEach(result => {
                 $select.append($('<option>', {
-                    value: result.time,
+                    value: JSON.stringify({ kahootId: result.kahootId, time: result.time }),
                     text: result.name,
                 }));
             });
@@ -53,13 +53,19 @@ $(async function() {
         }
 
         // Add onchange event handler
-        $select.on('change', function() {
+        $select.on('change', async function() {
             const selectedValue = $(this).val();
             if (selectedValue) {
-                console.log('Selected result UUID:', selectedValue);
-                // TODO: Add your logic here to handle the selected result
-                // For example, you might want to load details for this result
-                // loadResultDetails(selectedValue);
+                const { kahootId, time } = JSON.parse(selectedValue);
+                console.log('Selected result:', { kahootId, time });
+                
+                try {
+                    const reportDetails = await fetchReportDetails(kahootId, time);
+                    console.log('Report details:', reportDetails);
+                    // TODO: Process and display the report details
+                } catch (error) {
+                    console.error('Error fetching report details:', error);
+                }
             }
         });
 

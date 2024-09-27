@@ -62,4 +62,18 @@ async function getRecentResults() {
     }
 }
 
-Object.assign(window, { api, login, setTokenFromStorage, getRecentResults });
+async function fetchReportDetails(kahootId, time) {
+    const uuid = localStorage.getItem('uuid');
+    const url = `/reports/kahoots/${kahootId}/sessions/${uuid}/${time}/controllers`;
+    const params = { orderBy: 'rank', limit: 500 };
+
+    try {
+        const { data } = await api.get(url, { params });
+        return data;
+    } catch (error) {
+        console.error('Error fetching report details:', error);
+        return null;
+    }
+}
+
+Object.assign(window, { api, login, setTokenFromStorage, getRecentResults, fetchReportDetails });
