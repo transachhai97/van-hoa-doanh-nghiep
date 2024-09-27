@@ -28,8 +28,57 @@ $(async function() {
     try {
         const recentResults = await getRecentResults();
         console.log('Recent results:', recentResults);
-        // TODO: Process and display the recent results
+        
+        // Render recent results to select element
+        const $select = $('#recent-results');
+        $select.empty(); // Clear any existing options
+        
+        if (recentResults && recentResults.entities) {
+            $select.append($('<option>', {
+                value: '',
+                text: 'Select a recent result'
+            }));
+            
+            recentResults.entities.forEach(result => {
+                $select.append($('<option>', {
+                    value: result.time,
+                    text: result.name,
+                }));
+            });
+        } else {
+            $select.append($('<option>', {
+                value: '',
+                text: 'No recent results available'
+            }));
+        }
+
+        // Add onchange event handler
+        $select.on('change', function() {
+            const selectedValue = $(this).val();
+            if (selectedValue) {
+                console.log('Selected result UUID:', selectedValue);
+                // TODO: Add your logic here to handle the selected result
+                // For example, you might want to load details for this result
+                // loadResultDetails(selectedValue);
+            }
+        });
+
     } catch (error) {
         console.error('Error getting recent results:', error);
+        $('#recent-results').append($('<option>', {
+            value: '',
+            text: 'Error loading recent results'
+        }));
     }
 });
+
+// Example function to load result details (you would implement this)
+// async function loadResultDetails(uuid) {
+//     try {
+//         const details = await getResultDetails(uuid);
+//         console.log('Result details:', details);
+//         // Update your UI with the details
+//     } catch (error) {
+//         console.error('Error loading result details:', error);
+//     }
+// }

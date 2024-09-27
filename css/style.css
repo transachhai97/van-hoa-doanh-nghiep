@@ -18,3 +18,16 @@ body, html {
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-sizing: border-box;
 }
+
+#recent-results {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 250px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 1000;
+}

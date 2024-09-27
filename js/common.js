@@ -48,7 +48,7 @@ async function getRecentResults() {
         userId: localStorage.getItem('uuid'),
         resultType: 'LIVE_GAME',
         searchMode: 'HOST',
-        limit: 5,
+        limit: 10,
         orderBy: 'time',
         reverse: true
     };
