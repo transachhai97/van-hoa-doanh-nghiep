@@ -4,9 +4,8 @@ const api = axios.create({ baseURL: API_URL });
 api.interceptors.response.use(
     response => response,
     error => {
-        if (error.response && error.response.status === 401) {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('uuid');
+        if (error.response?.status === 401) {
+            ['access_token', 'uuid'].forEach(key => localStorage.removeItem(key));
             delete api.defaults.headers.common['Authorization'];
         }
         return Promise.reject(error);
