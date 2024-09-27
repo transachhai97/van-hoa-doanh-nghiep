@@ -1,4 +1,10 @@
-$(document).ready(function() {
+$(document).ready(async function() {
+    // Try to set token from storage first
+    if (!setTokenFromStorage()) {
+        // If no token in storage, try to login
+        await login();
+    }
+
     const gridContainer = $('#grid-container');
     
     // Set grid template
