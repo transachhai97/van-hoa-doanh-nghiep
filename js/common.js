@@ -1,37 +1,40 @@
-// Create axios instance
-const api = axios.create({
-    baseURL: API_URL
-});
+const api = axios.create({ baseURL: API_URL });
 
-// Function to login and set access token
+// Add a response interceptor
+api.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('uuid');
+            delete api.defaults.headers.common['Authorization'];
+        }
+        return Promise.reject(error);
+    }
+);
+
 async function login() {
     try {
-        const response = await api.post('/authenticate', {
+        const { data } = await api.post('/authenticate', {
             username: USER_NAME,
             password: PASSWORD,
             grant_type: 'password',
         });
 
-        if (response.data && response.data.access_token) {
-            // Store the access token in localStorage
-            localStorage.setItem('access_token', response.data.access_token);
+        if (!data?.access_token) throw new Error('No access token received');
 
-            // Set the default Authorization header for future requests
-            api.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('uuid', data.user.uuid);
+        api.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
 
-            console.log('Login successful');
-            return true;
-        } else {
-            console.error('Login failed: No access token received');
-            return false;
-        }
+        console.log('Login successful');
+        return true;
     } catch (error) {
         console.error('Login error:', error);
         return false;
     }
 }
 
-// Function to check if we have a valid token and set it
 function setTokenFromStorage() {
     const token = localStorage.getItem('access_token');
     if (token) {
@@ -41,7 +44,4 @@ function setTokenFromStorage() {
     return false;
 }
 
-// Export the api instance and functions
-window.api = api;
-window.login = login;
-window.setTokenFromStorage = setTokenFromStorage;
+Object.assign(window, { api, login, setTokenFromStorage });
