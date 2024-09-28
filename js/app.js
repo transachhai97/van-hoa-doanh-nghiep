@@ -120,7 +120,12 @@ const kahoot = {
 
     // Update grid with data
     updateGridWithData(entities) {
-        entities.forEach((entity, index) => {
+        // Sort entities by correctAnswersCount in descending order
+        const sortedEntities = entities.sort((a, b) => 
+            b.reportData.correctAnswersCount - a.reportData.correctAnswersCount
+        );
+
+        sortedEntities.forEach((entity, index) => {
             const $gridItem = $(`#grid-item-${index}`);
             if ($gridItem.length) {
                 $gridItem.html(`
@@ -131,6 +136,11 @@ const kahoot = {
                 `);
             }
         });
+
+        // If there are fewer entities than grid items, clear the remaining grid items
+        for (let i = sortedEntities.length; i < GRID_COLUMNS * GRID_ROWS; i++) {
+            $(`#grid-item-${i}`).empty();
+        }
     }
 };
 
