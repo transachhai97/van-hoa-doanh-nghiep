@@ -1,7 +1,9 @@
 import { API_URL, USER_NAME, PASSWORD, GRID_COLUMNS, GRID_ROWS } from './config.js';
 
-// Set up Axios instance and local storage utility
+// Set up Axios instance with base URL
 const api = axios.create({ baseURL: API_URL });
+
+// Local storage utility object
 const storage = {
     get: key => localStorage.getItem(key),
     set: (key, value) => localStorage.setItem(key, value),
@@ -11,12 +13,13 @@ const storage = {
 // Request counter for loading overlay
 let requestCount = 0;
 
-// Functions to show/hide loading overlay
+// Function to show loading overlay
 const showLoading = () => {
     requestCount++;
     $('#loading-overlay').removeClass('hidden');
 };
 
+// Function to hide loading overlay
 const hideLoading = () => {
     requestCount--;
     if (requestCount === 0) {
@@ -24,12 +27,13 @@ const hideLoading = () => {
     }
 };
 
-// Axios interceptors for request and response
+// Axios request interceptor
 api.interceptors.request.use(
     config => (showLoading(), config),
     error => (hideLoading(), Promise.reject(error))
 );
 
+// Axios response interceptor
 api.interceptors.response.use(
     response => (hideLoading(), response),
     error => {
@@ -44,6 +48,7 @@ api.interceptors.response.use(
 
 // Authentication module
 const auth = {
+    // Login function
     async login() {
         try {
             const { data } = await api.post('/authenticate', {
@@ -66,6 +71,7 @@ const auth = {
         }
     },
 
+    // Set token from storage
     setTokenFromStorage() {
         const token = storage.get('access_token');
         if (token) {
@@ -78,6 +84,7 @@ const auth = {
 
 // Kahoot API interaction module
 const kahoot = {
+    // Get recent results
     async getRecentResults() {
         const params = {
             userId: storage.get('uuid'),
@@ -97,6 +104,7 @@ const kahoot = {
         }
     },
 
+    // Fetch report details
     async fetchReportDetails(kahootId, time) {
         const uuid = storage.get('uuid');
         const url = `/reports/kahoots/${kahootId}/sessions/${uuid}/${time}/controllers`;
@@ -111,6 +119,7 @@ const kahoot = {
         }
     },
 
+    // Update grid with data
     updateGridWithData(entities) {
         entities.forEach((entity, index) => {
             const $gridItem = $(`#grid-item-${index}`);
@@ -128,6 +137,7 @@ const kahoot = {
 
 // UI module
 const ui = {
+    // Create grid
     createGrid() {
         const $gridContainer = $('#grid-container');
         $gridContainer.css({
@@ -144,15 +154,14 @@ const ui = {
         $gridContainer.html(gridHtml);
     },
 
+    // Resize grid
     resizeGrid() {
         const $gridContainer = $('#grid-container');
         const $footer = $('#footer');
         const footerHeight = $footer.outerHeight(true);
         
-        // Set the grid container height using calc() and vh units
         $gridContainer.css('height', `calc(100vh - ${footerHeight}px)`);
 
-        // Get the actual height of the grid container after setting it
         const gridHeight = $gridContainer.height();
         const gridWidth = $gridContainer.width();
 
@@ -165,6 +174,7 @@ const ui = {
         });
     },
 
+    // Populate recent results
     async populateRecentResults() {
         const $select = $('#recent-results');
         $select.empty();
@@ -194,6 +204,7 @@ const ui = {
         }
     },
 
+    // Refresh report details
     async refreshReportDetails() {
         const selectedValue = $('#recent-results').val();
         
@@ -212,6 +223,7 @@ const ui = {
         }
     },
 
+    // Set up event listeners
     setupEventListeners() {
         $('#recent-results').off('change').on('change', async function() {
             const selectedValue = $(this).val();
