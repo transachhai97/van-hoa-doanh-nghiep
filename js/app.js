@@ -120,10 +120,14 @@ const kahoot = {
 
     // Update grid with data
     updateGridWithData(entities) {
-        // Sort entities by correctAnswersCount in descending order
-        const sortedEntities = entities.sort((a, b) => 
-            b.reportData.correctAnswersCount - a.reportData.correctAnswersCount
-        );
+        console.log('entities', entities);
+        // Sort entities by correctAnswersCount (descending) and then by unansweredCount (ascending)
+        const sortedEntities = entities.sort((a, b) => {
+            if (b.reportData.correctAnswersCount !== a.reportData.correctAnswersCount) {
+                return b.reportData.correctAnswersCount - a.reportData.correctAnswersCount;
+            }
+            return a.reportData.unansweredCount - b.reportData.unansweredCount;
+        });
 
         sortedEntities.forEach((entity, index) => {
             const $gridItem = $(`#grid-item-${index}`);
@@ -137,7 +141,7 @@ const kahoot = {
             }
         });
 
-        // If there are fewer entities than grid items, clear the remaining grid items
+        // Clear remaining grid items if there are fewer entities than grid spaces
         for (let i = sortedEntities.length; i < GRID_COLUMNS * GRID_ROWS; i++) {
             $(`#grid-item-${i}`).empty();
         }
