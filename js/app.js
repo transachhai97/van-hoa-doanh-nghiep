@@ -121,28 +121,43 @@ const kahoot = {
     // Update grid with data
     updateGridWithData(entities) {
         console.log('entities', entities);
-        // Sort entities by correctAnswersCount (descending) and then by unansweredCount (ascending)
-        const sortedEntities = entities.sort((a, b) => {
-            if (b.reportData.correctAnswersCount !== a.reportData.correctAnswersCount) {
-                return b.reportData.correctAnswersCount - a.reportData.correctAnswersCount;
+        
+        // Nhóm entities theo nickname (phần trước dấu ".")
+        const groupedEntities = entities.reduce((groups, entity) => {
+            const groupName = entity.controller.nickname.split('.')[0];
+            if (!groups[groupName]) {
+                groups[groupName] = [];
             }
-            return a.reportData.unansweredCount - b.reportData.unansweredCount;
-        });
+            groups[groupName].push(entity);
+            return groups;
+        }, {});
 
-        sortedEntities.forEach((entity, index) => {
+        // Tính tổng điểm cho mỗi nhóm
+        const groupScores = Object.entries(groupedEntities).map(([groupName, groupEntities]) => ({
+            groupName,
+            totalScore: groupEntities.reduce((sum, entity) => sum + entity.reportData.correctAnswersCount, 0),
+        }));
+
+        // Sắp xếp groupScores theo totalScore giảm dần
+        groupScores.sort((a, b) => b.totalScore - a.totalScore);
+
+        console.log('groupScores', groupScores);
+
+        // Cập nhật lưới với thông tin nhóm
+        groupScores.forEach((group, index) => {
             const $gridItem = $(`#grid-item-${index}`);
             if ($gridItem.length) {
                 $gridItem.html(`
                     <div class="player-info">
-                        <p class="nickname" title="${entity.controller.nickname}">${entity.controller.nickname}</p>
-                        <p class="score">${entity.reportData.correctAnswersCount}</p>
+                        <p class="nickname" title="${group.groupName}">${group.groupName}</p>
+                        <p class="score">${group.totalScore}</p>
                     </div>
                 `);
             }
         });
 
-        // Clear remaining grid items if there are fewer entities than grid spaces
-        for (let i = sortedEntities.length; i < GRID_COLUMNS * GRID_ROWS; i++) {
+        // Xóa các ô lưới còn lại nếu có ít nhóm hơn số ô lưới
+        for (let i = groupScores.length; i < GRID_COLUMNS * GRID_ROWS; i++) {
             $(`#grid-item-${i}`).empty();
         }
     }
