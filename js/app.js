@@ -160,7 +160,6 @@ const ui = {
 
     async populateRecentResults() {
         const $select = $('#recent-results');
-        const currentValue = $select.val();
         $select.empty();
 
         try {
@@ -168,32 +167,27 @@ const ui = {
             console.log('Recent results:', recentResults);
 
             if (recentResults?.entities?.length) {
-                const options = recentResults.entities.map(result => ({
-                    value: JSON.stringify({ kahootId: result.kahootId, time: result.time }),
-                    text: result.name
-                }));
+                recentResults.entities.forEach((result, index) => {
+                    const value = JSON.stringify({ kahootId: result.kahootId, time: result.time });
+                    $select.append($('<option>', {
+                        value: value,
+                        text: result.name
+                    }));
+                });
 
-                options.unshift({ value: '', text: 'Select a recent result' });
-                
-                $select.append(options.map(option => 
-                    $('<option>', option)
-                ));
+                // Automatically select the first item
+                $select.val($select.find('option:first').val());
 
-                if (currentValue && $select.find(`option[value='${currentValue}']`).length) {
-                    $select.val(currentValue);
-                } else {
-                    $select.val($select.find('option:first').val());
-                }
+                // Call API for the first item's details
+                const firstItemValue = JSON.parse($select.val());
+                const data = await kahoot.fetchReportDetails(firstItemValue.kahootId, firstItemValue.time);
+                kahoot.updateGridWithData(data.entities);
             } else {
                 $select.append($('<option>', { value: '', text: 'No recent results available' }));
             }
         } catch (error) {
             console.error('Error getting recent results:', error);
             $select.append($('<option>', { value: '', text: 'Error loading recent results' }));
-        }
-
-        if ($select.val() !== currentValue) {
-            $select.trigger('change');
         }
     },
 
