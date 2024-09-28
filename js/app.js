@@ -7,9 +7,38 @@ const storage = {
     remove: key => localStorage.removeItem(key)
 };
 
-api.interceptors.response.use(
-    response => response,
+let requestCount = 0;
+
+function showLoading() {
+    requestCount++;
+    $('#loading-overlay').removeClass('hidden');
+}
+
+function hideLoading() {
+    requestCount--;
+    if (requestCount === 0) {
+        $('#loading-overlay').addClass('hidden');
+    }
+}
+
+api.interceptors.request.use(
+    config => {
+        showLoading();
+        return config;
+    },
     error => {
+        hideLoading();
+        return Promise.reject(error);
+    }
+);
+
+api.interceptors.response.use(
+    response => {
+        hideLoading();
+        return response;
+    },
+    error => {
+        hideLoading();
         if (error.response?.status === 401) {
             ['access_token', 'uuid'].forEach(storage.remove);
             delete api.defaults.headers.common['Authorization'];
