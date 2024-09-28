@@ -1,5 +1,6 @@
 import { API_URL, USER_NAME, PASSWORD, GRID_COLUMNS, GRID_ROWS } from './config.js';
 
+// Set up Axios instance and local storage utility
 const api = axios.create({ baseURL: API_URL });
 const storage = {
     get: key => localStorage.getItem(key),
@@ -7,8 +8,10 @@ const storage = {
     remove: key => localStorage.removeItem(key)
 };
 
+// Request counter for loading overlay
 let requestCount = 0;
 
+// Functions to show/hide loading overlay
 const showLoading = () => {
     requestCount++;
     $('#loading-overlay').removeClass('hidden');
@@ -21,6 +24,7 @@ const hideLoading = () => {
     }
 };
 
+// Axios interceptors for request and response
 api.interceptors.request.use(
     config => (showLoading(), config),
     error => (hideLoading(), Promise.reject(error))
@@ -38,6 +42,7 @@ api.interceptors.response.use(
     }
 );
 
+// Authentication module
 const auth = {
     async login() {
         try {
@@ -71,6 +76,7 @@ const auth = {
     }
 };
 
+// Kahoot API interaction module
 const kahoot = {
     async getRecentResults() {
         const params = {
@@ -120,6 +126,7 @@ const kahoot = {
     }
 };
 
+// UI module
 const ui = {
     createGrid() {
         const $gridContainer = $('#grid-container');
@@ -139,9 +146,18 @@ const ui = {
 
     resizeGrid() {
         const $gridContainer = $('#grid-container');
-        const { width: containerWidth, height: containerHeight } = $gridContainer[0].getBoundingClientRect();
-        const cellWidth = containerWidth / GRID_COLUMNS;
-        const cellHeight = containerHeight / GRID_ROWS;
+        const $footer = $('#footer');
+        const footerHeight = $footer.outerHeight(true);
+        
+        // Set the grid container height using calc() and vh units
+        $gridContainer.css('height', `calc(100vh - ${footerHeight}px)`);
+
+        // Get the actual height of the grid container after setting it
+        const gridHeight = $gridContainer.height();
+        const gridWidth = $gridContainer.width();
+
+        const cellWidth = gridWidth / GRID_COLUMNS;
+        const cellHeight = gridHeight / GRID_ROWS;
 
         $('.grid-item').css({
             width: `${cellWidth}px`,
@@ -216,6 +232,7 @@ const ui = {
     }
 };
 
+// Main application initialization function
 async function initializeApp() {
     if (!auth.setTokenFromStorage()) {
         await auth.login();
@@ -229,4 +246,5 @@ async function initializeApp() {
     ui.setupEventListeners();
 }
 
+// Run initialization when document is ready
 $(initializeApp);
