@@ -9,6 +9,9 @@
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
 </head>
 <body>
+    <!-- Add this canvas element for fireworks -->
+    <canvas id="fireworks-canvas"></canvas>
+
     <!-- Loading overlay -->
     <div id="loading-overlay" class="hidden">
         <img src="images/favicon.ico" alt="Loading" class="spinner">
@@ -21,7 +24,7 @@
     <div id="footer">
         <div id="footer-left">
             <button id="fullscreen-toggle"><img src="images/favicon.ico" alt="Fullscreen" class="fullscreen-icon"></button>
-            <div id="footer-text">Hội thi Văn hóa doanh nghiệp</div>
+            <div id="footer-text" data-action="toggle-fireworks">Hội thi Đại sứ văn hóa</div>
         </div>
         <div id="controls">
             <select id="recent-results"></select>
@@ -29,9 +32,13 @@
         </div>
     </div>
     
+    
     <!-- JavaScript library imports -->
     <script src="libs/jquery/jquery.min.js"></script>
     <script src="libs/axios/axios.min.js"></script>
+    
+    <!-- Add the fireworks script -->
+    <script src="js/fireworks.js" type="module"></script>
     
     <!-- Main application script -->
     <script src="js/app.js" type="module"></script>

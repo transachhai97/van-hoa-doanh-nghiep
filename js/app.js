@@ -1,4 +1,5 @@
 import { API_URL, USER_NAME, PASSWORD, GRID_COLUMNS, GRID_ROWS } from './config.js';
+import { FireworksManager } from './fireworks.js';
 
 // Set up Axios instance with base URL
 const api = axios.create({ baseURL: API_URL });
@@ -160,11 +161,16 @@ const kahoot = {
         for (let i = groupScores.length; i < GRID_COLUMNS * GRID_ROWS; i++) {
             $(`#grid-item-${i}`).empty();
         }
+
+        // Trigger fireworks after updating the grid
+        ui.triggerFireworks();
     }
 };
 
 // UI module
 const ui = {
+    fireworksManager: null,
+
     // Create grid
     createGrid() {
         const $gridContainer = $('#grid-container');
@@ -257,6 +263,46 @@ const ui = {
         }
     },
 
+    // Initialize fireworks
+    initFireworks() {
+        const canvas = document.getElementById('fireworks-canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        this.fireworksManager = new FireworksManager(canvas);
+        $(canvas).hide(); // Hide canvas initially
+    },
+
+    // Trigger fireworks
+    triggerFireworks() {
+        if (this.fireworksManager) {
+            this.fireworksManager.start();
+        }
+    },
+
+    // Stop fireworks
+    stopFireworks() {
+        if (this.fireworksManager) {
+            this.fireworksManager.stop();
+        }
+    },
+
+    // Toggle fireworks
+    toggleFireworks() {
+        if (this.fireworksManager) {
+            this.fireworksManager.toggle();
+            const $footerText = $('#footer-text');
+            const $fireworksCanvas = $('#fireworks-canvas');
+            
+            if (this.fireworksManager.isRunning) {
+                $footerText.addClass('fireworks-active');
+                $fireworksCanvas.show();
+            } else {
+                $footerText.removeClass('fireworks-active');
+                $fireworksCanvas.hide();
+            }
+        }
+    },
+
     // Set up event listeners
     setupEventListeners() {
         $('#recent-results').off('change').on('change', async function() {
@@ -277,6 +323,21 @@ const ui = {
         $('#refresh-data').off('click').on('click', ui.refreshReportDetails);
 
         $('#fullscreen-toggle').off('click').on('click', ui.toggleFullscreen);
+
+        $('#toggle-fireworks').off('click').on('click', () => this.toggleFireworks());
+
+        $('#footer-text').off('click').on('click', () => this.toggleFireworks());
+
+        $(window).on('resize', () => {
+            this.resizeGrid();
+            if (this.fireworksManager) {
+                const canvas = document.getElementById('fireworks-canvas');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        });
+
+        $('#stop-fireworks').off('click').on('click', () => this.stopFireworks());
     }
 };
 
@@ -288,6 +349,7 @@ async function initializeApp() {
 
     ui.createGrid();
     ui.resizeGrid();
+    ui.initFireworks(); // Initialize fireworks
     $(window).on('resize', ui.resizeGrid);
 
     await ui.populateRecentResults();
