@@ -21,8 +21,7 @@ const showLoading = () => {
 
 // Function to hide loading overlay
 const hideLoading = () => {
-    requestCount--;
-    if (requestCount === 0) {
+    if (--requestCount === 0) {
         $('#loading-overlay').addClass('hidden');
     }
 };
@@ -126,8 +125,8 @@ const kahoot = {
             if ($gridItem.length) {
                 $gridItem.html(`
                     <div class="player-info">
-                        <p class="nickname">${entity.controller.nickname}</p>
-                        <p class="score">Score: ${entity.reportData.correctAnswersCount}</p>
+                        <p class="nickname" title="${entity.controller.nickname}">${entity.controller.nickname}</p>
+                        <p class="score">${entity.reportData.correctAnswersCount}</p>
                     </div>
                 `);
             }
