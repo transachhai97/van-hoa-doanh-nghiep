@@ -217,6 +217,17 @@ const ui = {
         }
     },
 
+    // Toggle fullscreen
+    toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    },
+
     // Set up event listeners
     setupEventListeners() {
         $('#recent-results').off('change').on('change', async function() {
@@ -235,6 +246,8 @@ const ui = {
         });
 
         $('#refresh-data').off('click').on('click', ui.refreshReportDetails);
+
+        $('#fullscreen-toggle').off('click').on('click', ui.toggleFullscreen);
     }
 };
 
