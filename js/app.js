@@ -9,34 +9,25 @@ const storage = {
 
 let requestCount = 0;
 
-function showLoading() {
+const showLoading = () => {
     requestCount++;
     $('#loading-overlay').removeClass('hidden');
-}
+};
 
-function hideLoading() {
+const hideLoading = () => {
     requestCount--;
     if (requestCount === 0) {
         $('#loading-overlay').addClass('hidden');
     }
-}
+};
 
 api.interceptors.request.use(
-    config => {
-        showLoading();
-        return config;
-    },
-    error => {
-        hideLoading();
-        return Promise.reject(error);
-    }
+    config => (showLoading(), config),
+    error => (hideLoading(), Promise.reject(error))
 );
 
 api.interceptors.response.use(
-    response => {
-        hideLoading();
-        return response;
-    },
+    response => (hideLoading(), response),
     error => {
         hideLoading();
         if (error.response?.status === 401) {
@@ -167,18 +158,14 @@ const ui = {
             console.log('Recent results:', recentResults);
 
             if (recentResults?.entities?.length) {
-                recentResults.entities.forEach((result, index) => {
-                    const value = JSON.stringify({ kahootId: result.kahootId, time: result.time });
-                    $select.append($('<option>', {
-                        value: value,
-                        text: result.name
-                    }));
-                });
-
-                // Automatically select the first item
+                const options = recentResults.entities.map(result => ({
+                    value: JSON.stringify({ kahootId: result.kahootId, time: result.time }),
+                    text: result.name
+                }));
+                
+                $select.append(options.map(option => $('<option>', option)));
                 $select.val($select.find('option:first').val());
 
-                // Call API for the first item's details
                 const firstItemValue = JSON.parse($select.val());
                 const data = await kahoot.fetchReportDetails(firstItemValue.kahootId, firstItemValue.time);
                 kahoot.updateGridWithData(data.entities);
