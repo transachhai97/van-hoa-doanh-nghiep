@@ -49,13 +49,59 @@ class Firework {
     }
 }
 
+class FallingFlower {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 5 + 5;
+        this.speedX = Math.random() * 2 - 1;
+        this.speedY = Math.random() * 1 + 1;
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = Math.random() * 2 - 1;
+        this.hue = Math.random() * 60 + 300; // Màu hoa anh đào
+    }
+
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.rotation += this.rotationSpeed;
+    }
+
+    draw(ctx) {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation * Math.PI / 180);
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+            const angle = (i * 72 + 45) * Math.PI / 180;
+            const x = this.size * Math.cos(angle);
+            const y = this.size * Math.sin(angle);
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.closePath();
+        ctx.fillStyle = `hsl(${this.hue}, 100%, 70%)`;
+        ctx.fill();
+        ctx.restore();
+    }
+
+    isOffScreen(canvasHeight) {
+        return this.y > canvasHeight;
+    }
+}
+
 export class FireworksManager {
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.fireworks = [];
+        this.flowers = [];
         this.isRunning = false;
         this.lastFireworkTime = 0;
+        this.lastFlowerTime = 0;
     }
 
     toggle() {
@@ -85,12 +131,23 @@ export class FireworksManager {
         this.fireworks.push(new Firework(x, y));
     }
 
+    addFlower() {
+        const x = Math.random() * this.canvas.width;
+        const y = Math.random() * this.canvas.height;
+        this.flowers.push(new FallingFlower(x, y));
+    }
+
     animate(currentTime) {
         if (!this.isRunning) return;
 
         if (currentTime - this.lastFireworkTime > 100) { // Add new firework every 100ms
             this.addFirework();
             this.lastFireworkTime = currentTime;
+        }
+
+        if (currentTime - this.lastFlowerTime > 500) { // Add new flower every 500ms
+            this.addFlower();
+            this.lastFlowerTime = currentTime;
         }
 
         this.ctx.globalCompositeOperation = 'destination-out';
@@ -102,6 +159,12 @@ export class FireworksManager {
             firework.update();
             firework.draw(this.ctx);
             return !firework.isDead();
+        });
+
+        this.flowers = this.flowers.filter(flower => {
+            flower.update();
+            flower.draw(this.ctx);
+            return !flower.isOffScreen(this.canvas.height);
         });
 
         requestAnimationFrame((time) => this.animate(time));
