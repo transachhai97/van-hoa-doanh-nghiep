@@ -157,11 +157,6 @@ const ui = {
     // Resize grid
     resizeGrid() {
         const $gridContainer = $('#grid-container');
-        const $footer = $('#footer');
-        const footerHeight = $footer.outerHeight(true);
-        
-        $gridContainer.css('height', `calc(100vh - ${footerHeight}px)`);
-
         const gridHeight = $gridContainer.height();
         const gridWidth = $gridContainer.width();
 
