@@ -200,16 +200,6 @@ body, html {
     100% { transform: rotate(360deg); }
 }
 
-/* Media queries */
-@media (max-width: 768px) {
-    .nickname {
-        font-size: 12px;
-    }
-    .score {
-        font-size: 20px;
-    }
-}
-
 /* Fullscreen button styles */
 #fullscreen-toggle {
     width: 40px;
