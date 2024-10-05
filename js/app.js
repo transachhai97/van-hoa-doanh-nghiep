@@ -1,4 +1,4 @@
-import { API_URL, USER_NAME, PASSWORD, GRID_COLUMNS, GRID_ROWS } from './config.js';
+import { API_URL, USER_NAME, PASSWORD, GRID_COLUMNS_LANDSCAPE, GRID_ROWS_LANDSCAPE, GRID_COLUMNS_PORTRAIT, GRID_ROWS_PORTRAIT } from './config.js';
 import { FireworksManager } from './fireworks.js';
 
 // Set up Axios instance with base URL
@@ -158,7 +158,7 @@ const kahoot = {
         });
 
         // Xóa các ô lưới còn lại nếu có ít nhóm hơn số ô lưới
-        for (let i = groupScores.length; i < GRID_COLUMNS * GRID_ROWS; i++) {
+        for (let i = groupScores.length; i < ui.getGridSize(); i++) {
             $(`#grid-item-${i}`).empty();
         }
 
@@ -170,22 +170,47 @@ const kahoot = {
 // UI module
 const ui = {
     fireworksManager: null,
+    isLandscape: window.innerWidth > window.innerHeight,
 
     // Create grid
     createGrid() {
         const $gridContainer = $('#grid-container');
-        $gridContainer.css({
-            'grid-template-columns': `repeat(${GRID_COLUMNS}, 1fr)`,
-            'grid-template-rows': `repeat(${GRID_ROWS}, 1fr)`
-        });
+        this.updateGridLayout();
         
-        const gridHtml = Array.from({ length: GRID_ROWS * GRID_COLUMNS }, (_, index) => {
-            const isEven = (Math.floor(index / GRID_COLUMNS) + Math.floor(index % GRID_COLUMNS)) % 2 === 0;
+        const gridHtml = Array.from({ length: this.getGridSize() }, (_, index) => {
+            const isEven = (Math.floor(index / this.getColumns()) + index % this.getColumns()) % 2 === 0;
             const colorClass = isEven ? 'color-1' : 'color-2';
             return `<div id="grid-item-${index}" class="grid-item ${colorClass}"></div>`;
         }).join('');
 
         $gridContainer.html(gridHtml);
+        this.resizeGrid();
+    },
+
+    // Update grid layout based on orientation
+    updateGridLayout() {
+        const $gridContainer = $('#grid-container');
+        this.isLandscape = window.innerWidth > window.innerHeight;
+        
+        $gridContainer.css({
+            'grid-template-columns': `repeat(${this.getColumns()}, 1fr)`,
+            'grid-template-rows': `repeat(${this.getRows()}, 1fr)`
+        });
+    },
+
+    // Get current number of columns
+    getColumns() {
+        return this.isLandscape ? GRID_COLUMNS_LANDSCAPE : GRID_COLUMNS_PORTRAIT;
+    },
+
+    // Get current number of rows
+    getRows() {
+        return this.isLandscape ? GRID_ROWS_LANDSCAPE : GRID_ROWS_PORTRAIT;
+    },
+
+    // Get total grid size
+    getGridSize() {
+        return this.getColumns() * this.getRows();
     },
 
     // Resize grid
@@ -194,8 +219,8 @@ const ui = {
         const gridHeight = $gridContainer.height();
         const gridWidth = $gridContainer.width();
 
-        const cellWidth = gridWidth / GRID_COLUMNS;
-        const cellHeight = gridHeight / GRID_ROWS;
+        const cellWidth = gridWidth / this.getColumns();
+        const cellHeight = gridHeight / this.getRows();
 
         $('.grid-item').css({
             width: `${cellWidth}px`,
@@ -329,7 +354,19 @@ const ui = {
         $('#footer-text').off('click').on('click', () => this.toggleFireworks());
 
         $(window).on('resize', () => {
-            this.resizeGrid();
+            const wasLandscape = this.isLandscape;
+            this.isLandscape = window.innerWidth > window.innerHeight;
+            
+            if (wasLandscape !== this.isLandscape) {
+                this.createGrid();
+                this.updateGridWithCurrentData();
+            } else {
+                this.updateGridLayout();
+                this.resizeGrid();
+            }
+            
+            this.updateFooterLayout();
+            
             if (this.fireworksManager) {
                 const canvas = document.getElementById('fireworks-canvas');
                 canvas.width = window.innerWidth;
@@ -338,6 +375,34 @@ const ui = {
         });
 
         $('#stop-fireworks').off('click').on('click', () => this.stopFireworks());
+    },
+
+    // Thêm phương thức mới để cập nhật lưới với dữ liệu hiện tại
+    updateGridWithCurrentData() {
+        const selectedValue = $('#recent-results').val();
+        if (selectedValue) {
+            const { kahootId, time } = JSON.parse(selectedValue);
+            kahoot.fetchReportDetails(kahootId, time).then(data => {
+                kahoot.updateGridWithData(data.entities);
+            });
+        }
+    },
+
+    updateFooterLayout() {
+        const isMobile = window.innerWidth <= 768;
+        const $footer = $('#footer');
+        const $footerLeft = $('#footer-left');
+        const $controls = $('#controls');
+
+        if (isMobile) {
+            $footer.css('justify-content', 'center');
+            $footerLeft.hide();
+            $controls.css('width', '100%');
+        } else {
+            $footer.css('justify-content', 'space-between');
+            $footerLeft.show();
+            $controls.css('width', 'auto');
+        }
     }
 };
 
@@ -348,12 +413,15 @@ async function initializeApp() {
     }
 
     ui.createGrid();
-    ui.resizeGrid();
-    ui.initFireworks(); // Initialize fireworks
-    $(window).on('resize', ui.resizeGrid);
-
-    await ui.populateRecentResults();
     ui.setupEventListeners();
+    await ui.populateRecentResults();
+
+    ui.updateGridLayout();
+    ui.resizeGrid();
+    ui.updateFooterLayout(); // Thêm dòng này
+
+    // Thêm đoạn code sau để khởi tạo fireworks
+    ui.initFireworks();
 }
 
 // Run initialization when document is ready

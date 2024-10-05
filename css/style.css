@@ -88,16 +88,45 @@ body, html {
     padding: 10px;
     cursor: pointer;
     transition: text-shadow 0.3s ease, color 0.3s ease;
-}
-
-#footer-text:hover {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #controls {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+}
+
+/* Responsive styles for footer */
+@media (max-width: 768px) {
+    #footer {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+    }
+
+    #footer-left, #controls {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    #footer-text {
+        font-size: 16px;
+        padding: 5px;
+    }
+
+    #recent-results {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #refresh-data, #fullscreen-toggle {
+        width: 30px;
+        height: 30px;
+    }
 }
 
 /* Dropdown styles */
