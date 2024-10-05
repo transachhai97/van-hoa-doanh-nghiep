@@ -380,6 +380,32 @@ const ui = {
         });
 
         $('#stop-fireworks').off('click').on('click', () => this.stopFireworks());
+
+        // Add new key press event listener
+        let isAPressed = false;
+        let isDPressed = false;
+
+        $(document).on('keydown', (e) => {
+            if (e.key.toLowerCase() === 'a') {
+                isAPressed = true;
+            }
+            if (e.key.toLowerCase() === 'd') {
+                isDPressed = true;
+            }
+
+            if (isAPressed && isDPressed) {
+                this.refreshReportDetails();
+            }
+        });
+
+        $(document).on('keyup', (e) => {
+            if (e.key.toLowerCase() === 'a') {
+                isAPressed = false;
+            }
+            if (e.key.toLowerCase() === 'd') {
+                isDPressed = false;
+            }
+        });
     },
 
     // Thêm phương thức mới để cập nhật lưới với dữ liệu hiện tại
