@@ -123,7 +123,7 @@ const kahoot = {
     updateGridWithData(entities) {
         console.log('entities', entities);
         
-        // Nhóm entities theo nickname (phần trước dấu ".")
+        // Group entities by nickname (part before ".")
         const groupedEntities = entities.reduce((groups, entity) => {
             const groupName = entity.controller.nickname.split('.')[0];
             if (!groups[groupName]) {
@@ -133,31 +133,36 @@ const kahoot = {
             return groups;
         }, {});
 
-        // Tính tổng điểm cho mỗi nhóm
+        // Calculate total score for each group
         const groupScores = Object.entries(groupedEntities).map(([groupName, groupEntities]) => ({
             groupName,
             totalScore: groupEntities.reduce((sum, entity) => sum + entity.reportData.correctAnswersCount, 0),
         }));
 
-        // Sắp xếp groupScores theo totalScore giảm dần
-        groupScores.sort((a, b) => b.totalScore - a.totalScore);
+        // Sort groupScores by totalScore (descending) and then by groupName (ascending)
+        groupScores.sort((a, b) => {
+            if (b.totalScore !== a.totalScore) {
+                return b.totalScore - a.totalScore;
+            }
+            return a.groupName.localeCompare(b.groupName);
+        });
 
         console.log('groupScores', groupScores);
 
-        // Cập nhật lưới với thông tin nhóm
+        // Update grid with group information
         groupScores.forEach((group, index) => {
             const $gridItem = $(`#grid-item-${index}`);
             if ($gridItem.length) {
                 $gridItem.html(`
                     <div class="player-info">
                         <p class="nickname" title="${group.groupName}">${group.groupName}</p>
-                        <p class="score">${group.totalScore}</p>
+                        <p class="score">${group.totalScore * 4}</p>
                     </div>
                 `);
             }
         });
 
-        // Xóa các ô lưới còn lại nếu có ít nhóm hơn số ô lưới
+        // Clear remaining grid items if there are fewer groups than grid cells
         for (let i = groupScores.length; i < ui.getGridSize(); i++) {
             $(`#grid-item-${i}`).empty();
         }
