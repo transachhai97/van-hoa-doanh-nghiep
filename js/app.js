@@ -157,7 +157,7 @@ const kahoot = {
                 $gridItem.html(`
                     <div class="player-info">
                         <p class="nickname" title="${group.groupName}">${group.groupName.toUpperCase()}</p>
-                        <p class="score">${group.totalScore ? group.totalScore * 4 : '&nbsp;'}</p>
+                        <p class="score">${group.totalScore * 4}</p>
                     </div>
                 `);
             }
@@ -272,7 +272,7 @@ const ui = {
         
         if (selectedValue === 'all') {
             // Update grid with data from dataArray
-            kahoot.updateGridWithData(dataArray.map(name => ({ controller: { nickname: name }, reportData: { correctAnswersCount: Math.floor(Math.random() * 100) } })));
+            kahoot.updateGridWithData(dataArray.map(name => ({ controller: { nickname: name }, reportData: { correctAnswersCount: 0 } })));
         } else if (selectedValue) {
             const { kahootId, time } = JSON.parse(selectedValue);
             console.log('Refreshing report details for:', { kahootId, time });
