@@ -1,5 +1,6 @@
 import { API_URL, USER_NAME, PASSWORD, GRID_COLUMNS_LANDSCAPE, GRID_ROWS_LANDSCAPE, GRID_COLUMNS_PORTRAIT, GRID_ROWS_PORTRAIT } from './config.js';
 import { FireworksManager } from './fireworks.js';
+import { dataArray } from './data.js'; // Import dataArray from data.js
 
 // Set up Axios instance with base URL
 const api = axios.create({ baseURL: API_URL });
@@ -125,7 +126,7 @@ const kahoot = {
         
         // Group entities by nickname (part before ".")
         const groupedEntities = entities.reduce((groups, entity) => {
-            const groupName = entity.controller.nickname.split('.')[0];
+            const groupName = entity.controller.nickname.split('/')[0];
             if (!groups[groupName]) {
                 groups[groupName] = [];
             }
@@ -155,8 +156,8 @@ const kahoot = {
             if ($gridItem.length) {
                 $gridItem.html(`
                     <div class="player-info">
-                        <p class="nickname" title="${group.groupName}">${group.groupName}</p>
-                        <p class="score">${group.totalScore * 4}</p>
+                        <p class="nickname" title="${group.groupName}">${group.groupName.toUpperCase()}</p>
+                        <p class="score">${group.totalScore ? group.totalScore * 4 : '&nbsp;'}</p>
                     </div>
                 `);
             }
@@ -247,6 +248,8 @@ const ui = {
                     value: JSON.stringify({ kahootId: result.kahootId, time: result.time }),
                     text: result.name
                 }));
+
+                options.push({value: 'all', text: 'Danh sách thí sinh'});
                 
                 $select.append(options.map(option => $('<option>', option)));
                 $select.val($select.find('option:first').val());
@@ -267,7 +270,10 @@ const ui = {
     async refreshReportDetails() {
         const selectedValue = $('#recent-results').val();
         
-        if (selectedValue) {
+        if (selectedValue === 'all') {
+            // Update grid with data from dataArray
+            kahoot.updateGridWithData(dataArray.map(name => ({ controller: { nickname: name }, reportData: { correctAnswersCount: Math.floor(Math.random() * 100) } })));
+        } else if (selectedValue) {
             const { kahootId, time } = JSON.parse(selectedValue);
             console.log('Refreshing report details for:', { kahootId, time });
 
@@ -337,7 +343,10 @@ const ui = {
     setupEventListeners() {
         $('#recent-results').off('change').on('change', async function() {
             const selectedValue = $(this).val();
-            if (selectedValue) {
+            if (selectedValue === 'all') {
+                // Update grid with data from dataArray
+                kahoot.updateGridWithData(dataArray.map(name => ({ controller: { nickname: name }, reportData: { correctAnswersCount: 0 } })));
+            } else if (selectedValue) {
                 const { kahootId, time } = JSON.parse(selectedValue);
                 console.log('Selected result:', { kahootId, time });
 
@@ -347,6 +356,8 @@ const ui = {
                 } catch (error) {
                     console.error('Error fetching report details:', error);
                 }
+            } else {
+                console.log('No report selected to refresh');
             }
         });
 
