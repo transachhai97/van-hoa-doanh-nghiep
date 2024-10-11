@@ -1,9 +1,9 @@
 // ... existing code ...
 export const dataArray = [
-    "01-b.khdn",
+    "01-khdn",
     "02-3thang2",
     "03-thanhxuan",
-    "04-b.kdvtt",
+    "04-kdvtt",
     "05-hanoi",
     "06-tphcm",
     "07-cqdtn",
@@ -57,7 +57,7 @@ export const dataArray = [
     "55-bacgiang",
     "56-laichau",
     "57-giadinh",
-    "58-b.ketoan",
+    "58-ketoan",
     "59-namb.duong",
     "60-longan",
     "61-ttdvkh",
