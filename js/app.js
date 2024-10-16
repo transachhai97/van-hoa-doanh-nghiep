@@ -272,7 +272,7 @@ const ui = {
         
         if (selectedValue === 'all') {
             // Update grid with data from dataArray
-            kahoot.updateGridWithData(dataArray.map(name => ({ controller: { nickname: name }, reportData: { correctAnswersCount: 0 } })));
+            kahoot.updateGridWithData(dataArray.map(item => ({ controller: { nickname: item.nickname }, reportData: { correctAnswersCount: item.score } })));
         } else if (selectedValue) {
             const { kahootId, time } = JSON.parse(selectedValue);
             console.log('Refreshing report details for:', { kahootId, time });
@@ -345,7 +345,7 @@ const ui = {
             const selectedValue = $(this).val();
             if (selectedValue === 'all') {
                 // Update grid with data from dataArray
-                kahoot.updateGridWithData(dataArray.map(name => ({ controller: { nickname: name }, reportData: { correctAnswersCount: 0 } })));
+                kahoot.updateGridWithData(dataArray.map(item => ({ controller: { nickname: item.nickname }, reportData: { correctAnswersCount: item.score } })));
             } else if (selectedValue) {
                 const { kahootId, time } = JSON.parse(selectedValue);
                 console.log('Selected result:', { kahootId, time });
