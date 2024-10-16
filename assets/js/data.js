@@ -29,7 +29,7 @@ export const dataArray = [
     "org": "Ban Kinh doanh vốn tiền tệ",
     "nickname": "04-kdvtt",
     "map_nickname": "04-kdvtt/1",
-    "score": 10
+    "score": 0
   },
   {
     "id": "05",
@@ -53,7 +53,7 @@ export const dataArray = [
     "org": "Cơ quan Đoàn Thanh niên BIDV",
     "nickname": "07-cqdtn",
     "map_nickname": "07-cqdtn/1",
-    "score": 20
+    "score": 0
   },
   {
     "id": "08",
@@ -93,7 +93,7 @@ export const dataArray = [
     "org": "CN Phú Xuân",
     "nickname": "12-phuxuan",
     "map_nickname": "12-phuxuan/1",
-    "score": 15
+    "score": 0
   },
   {
     "id": "13",
