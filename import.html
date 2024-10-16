@@ -1,0 +1,70 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Excel</title>
+</head>
+<body>
+    <h1>Import Excel File</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".xlsx, .xls" required>
+        <button type="submit">Upload</button>
+    </form>
+    <div id="response"></div>
+    <table id="data-table" border="1">
+        <thead>
+            <tr>
+                <th>SBD</th>
+                <th>Họ tên</th>
+                <th>Đơn vị</th>
+                <th>Nickname</th>
+                <th>Map Nickname</th>
+                <th>Điểm</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be populated here -->
+        </tbody>
+    </table>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('/import', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('response').innerText = data;
+                // Fetch and display the JSON data
+                fetch('assets/data/list.json')
+                    .then(response => response.json())
+                    .then(jsonData => {
+                        const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+                        tableBody.innerHTML = ''; // Clear existing data
+                        jsonData.forEach(item => {
+                            const row = tableBody.insertRow();
+                            row.insertCell(0).innerText = item.id;
+                            row.insertCell(1).innerText = item.name;
+                            row.insertCell(2).innerText = item.org;
+                            row.insertCell(3).innerText = item.nickname;
+                            row.insertCell(4).innerText = item.map_nickname;
+                            row.insertCell(5).innerText = item.score;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching JSON data:', error);
+                    });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

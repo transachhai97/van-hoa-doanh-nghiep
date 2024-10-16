@@ -1,2 +1,6 @@
 .vscode
 .idea
+node_modules
+# assets/templates
+assets/data
+package-lock.json
