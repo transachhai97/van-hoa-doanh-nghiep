@@ -33,8 +33,8 @@ app.post('/import', upload.single('file'), (req, res) => {
         id: item['ID'],
         name: item['NAME'], 
         org: item['ORG'],  
-        nickname: item['NICKNAME'],
-        map_nickname: item['MAP'],
+        nickname: item['NICKNAME'].toUpperCase(),
+        map_nickname: item['MAP'].split(',').map(nickname => nickname.trim().toUpperCase()), // Split and trim whitespace
         score: item['SCORE'],
     }));
 

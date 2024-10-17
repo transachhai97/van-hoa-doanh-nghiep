@@ -139,7 +139,7 @@ const kahoot = {
 
         // Calculate total score for each group
         const groupScores = Object.entries(groupedEntities).map(([groupName, groupEntities]) => ({
-            groupName,
+            groupName: groupName.toUpperCase(),
             totalScore: groupEntities.reduce((sum, entity) => {
                 const scoreDisplay = selectedValue === 'all' ? entity.reportData.correctAnswersCount : entity.reportData.correctAnswersCount * 4; // Conditional score calculation
                 return sum + scoreDisplay;
@@ -164,7 +164,7 @@ const kahoot = {
             if ($gridItem.length) {
                 $gridItem.html(`
                     <div class="player-info">
-                        <p class="nickname" title="${group.groupName}">${group.groupName.toUpperCase()}</p>
+                        <p class="nickname" title="${group.groupName}">${group.groupName}</p>
                         <p class="score">${group.totalScore}</p>
                     </div>
                 `);
@@ -196,6 +196,7 @@ const kahoot = {
 
     // Method to get current groupScores
     getGroupScores() {
+        console.log('download', this.currentGroupScores);
         return this.currentGroupScores || []; // Return current scores or empty array
     }
 };
