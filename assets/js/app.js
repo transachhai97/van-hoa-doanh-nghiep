@@ -150,13 +150,15 @@ const kahoot = {
         console.log('groupScores', groupScores);
 
         // Update grid with group information
+        const selectedValue = $('#recent-results').val(); // Get the selected value
         groupScores.forEach((group, index) => {
             const $gridItem = $(`#grid-item-${index}`);
             if ($gridItem.length) {
+                const scoreDisplay = selectedValue === 'all' ? group.totalScore : group.totalScore * 4; // Conditional score calculation
                 $gridItem.html(`
                     <div class="player-info">
                         <p class="nickname" title="${group.groupName}">${group.groupName.toUpperCase()}</p>
-                        <p class="score">${group.totalScore * 4}</p>
+                        <p class="score">${scoreDisplay}</p>
                     </div>
                 `);
             }
@@ -419,7 +421,7 @@ const ui = {
         });
     },
 
-    // Thêm phương thức mới để cập nhật lưới với dữ liệu hiện tại
+    // Th��m phương thức mới để cập nhật lưới với dữ liệu hiện tại
     updateGridWithCurrentData() {
         const selectedValue = $('#recent-results').val();
         if (selectedValue) {
