@@ -133,10 +133,15 @@ const kahoot = {
             return groups;
         }, {});
 
+        const selectedValue = $('#recent-results').val(); // Get the selected value
+
         // Calculate total score for each group
         const groupScores = Object.entries(groupedEntities).map(([groupName, groupEntities]) => ({
             groupName,
-            totalScore: groupEntities.reduce((sum, entity) => sum + entity.reportData.correctAnswersCount, 0),
+            totalScore: groupEntities.reduce((sum, entity) => {
+                const scoreDisplay = selectedValue === 'all' ? entity.reportData.correctAnswersCount : entity.reportData.correctAnswersCount * 4; // Conditional score calculation
+                return sum + scoreDisplay;
+            }, 0),
         }));
 
         // Sort groupScores by totalScore (descending) and then by groupName (ascending)
@@ -150,15 +155,13 @@ const kahoot = {
         console.log('groupScores', groupScores);
 
         // Update grid with group information
-        const selectedValue = $('#recent-results').val(); // Get the selected value
         groupScores.forEach((group, index) => {
             const $gridItem = $(`#grid-item-${index}`);
             if ($gridItem.length) {
-                const scoreDisplay = selectedValue === 'all' ? group.totalScore : group.totalScore * 4; // Conditional score calculation
                 $gridItem.html(`
                     <div class="player-info">
                         <p class="nickname" title="${group.groupName}">${group.groupName.toUpperCase()}</p>
-                        <p class="score">${scoreDisplay}</p>
+                        <p class="score">${group.totalScore}</p>
                     </div>
                 `);
             }
