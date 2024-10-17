@@ -2,6 +2,6 @@
 .idea
 node_modules
 # assets/templates
-assets/data
+assets/data/*.json
 assets/js/data.js
 package-lock.json

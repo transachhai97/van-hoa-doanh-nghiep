@@ -1,6 +1,5 @@
 import { API_URL, USER_NAME, PASSWORD, GRID_COLUMNS_LANDSCAPE, GRID_ROWS_LANDSCAPE, GRID_COLUMNS_PORTRAIT, GRID_ROWS_PORTRAIT } from './config.js';
 import { FireworksManager } from './fireworks.js';
-import { dataArray } from './data.js'; // Import dataArray from data.js
 
 // Set up Axios instance with base URL
 const api = axios.create({ baseURL: API_URL });
@@ -271,7 +270,8 @@ const ui = {
         const selectedValue = $('#recent-results').val();
         
         if (selectedValue === 'all') {
-            // Update grid with data from dataArray
+            // Fetch data from JSON file when "all" is selected
+            const dataArray = await fetchDataArray(); // Call fetchDataArray to get the data
             kahoot.updateGridWithData(dataArray.map(item => ({ controller: { nickname: item.nickname }, reportData: { correctAnswersCount: item.score } })));
         } else if (selectedValue) {
             const { kahootId, time } = JSON.parse(selectedValue);
@@ -448,6 +448,17 @@ const ui = {
     }
 };
 
+// Function to fetch data from JSON file
+async function fetchDataArray() {
+    try {
+        const response = await axios.get('assets/data/list.json'); // Axios call to fetch JSON data
+        return response.data; // Return the fetched data
+    } catch (error) {
+        console.error('Error fetching dataArray:', error);
+        return []; // Return an empty array in case of error
+    }
+}
+
 // Main application initialization function
 async function initializeApp() {
     if (!auth.setTokenFromStorage()) {
@@ -468,3 +479,7 @@ async function initializeApp() {
 
 // Run initialization when document is ready
 $(initializeApp);
+
+// Update grid with data from fetched dataArray
+const dataArray = await fetchDataArray(); // Fetch data before using it
+kahoot.updateGridWithData(dataArray.map(item => ({ controller: { nickname: item.nickname }, reportData: { correctAnswersCount: item.score } })));

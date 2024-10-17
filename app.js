@@ -42,7 +42,7 @@ app.post('/import', upload.single('file'), (req, res) => {
     fs.writeFileSync('assets/data/list.json', JSON.stringify(data, null, 2));
 
     // Ghi giá trị khởi tạo vào file list.js
-    fs.writeFileSync('assets/js/data.js', `export const dataArray = ${JSON.stringify(data, null, 2)};`);
+    // fs.writeFileSync('assets/js/data.js', `export const dataArray = ${JSON.stringify(data, null, 2)};`);
 
     res.send('File imported and data.json created, list.js initialized!');
 });
