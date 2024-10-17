@@ -124,14 +124,27 @@ const kahoot = {
     // Update grid with data
     updateGridWithData(entities) {
         console.log('entities', entities);
-        
+
+        // Retrieve dataArray from local storage
+        const storedDataArray = JSON.parse(localStorage.getItem('dataArray')) || []; // Get dataArray from local storage
+
         // Group entities by nickname (part before ".")
         const groupedEntities = entities.reduce((groups, entity) => {
-            const groupName = entity.controller.nickname.split('/')[0];
-            if (!groups[groupName]) {
-                groups[groupName] = [];
+
+            const correspondingData = storedDataArray.find(data => {
+                return data.map_nickname.includes(entity.controller.nickname.toUpperCase());
+            });
+
+            const groupName = correspondingData?.nickname ?? entity.controller.nickname.toUpperCase();
+            if(groupName) {
+                if (!groups[groupName]) {
+                    groups[groupName] = [];
+                }
+                groups[groupName].push({
+                    map_nickname: entity.controller.nickname.toUpperCase(),
+                    score: entity.reportData.correctAnswersCount ?? 0,
+                });
             }
-            groups[groupName].push(entity);
             return groups;
         }, {});
 
@@ -141,7 +154,7 @@ const kahoot = {
         const groupScores = Object.entries(groupedEntities).map(([groupName, groupEntities]) => ({
             groupName: groupName.toUpperCase(),
             totalScore: groupEntities.reduce((sum, entity) => {
-                const scoreDisplay = selectedValue === 'all' ? entity.reportData.correctAnswersCount : entity.reportData.correctAnswersCount * 4; // Conditional score calculation
+                const scoreDisplay = selectedValue === 'all' ? entity.score : entity.score * 4; // Conditional score calculation
                 return sum + scoreDisplay;
             }, 0),
         }));
@@ -485,6 +498,7 @@ const ui = {
 async function fetchDataArray() {
     try {
         const response = await axios.get('assets/data/list.json'); // Axios call to fetch JSON data
+        localStorage.setItem('dataArray', JSON.stringify(response.data)); // Store fetched data in local storage
         return response.data; // Return the fetched data
     } catch (error) {
         console.error('Error fetching dataArray:', error);
