@@ -84,6 +84,8 @@ const auth = {
 
 // Kahoot API interaction module
 const kahoot = {
+    currentGroupScores: [], // Store current group scores
+
     // Get recent results
     async getRecentResults() {
         const params = {
@@ -152,6 +154,8 @@ const kahoot = {
             return a.groupName.localeCompare(b.groupName);
         });
 
+        this.currentGroupScores = groupScores; // Store current group scores
+
         console.log('groupScores', groupScores);
 
         // Update grid with group information
@@ -174,6 +178,25 @@ const kahoot = {
 
         // Trigger fireworks after updating the grid
         ui.triggerFireworks();
+    },
+
+    // New function to download groupScores as Excel
+    downloadExcel() {
+        const groupScores = this.getGroupScores(); // Get current groupScores
+        if (groupScores.length === 0) {
+            console.error('No data available to download.');
+            return; // Exit if there are no scores to download
+        }
+
+        const worksheet = XLSX.utils.json_to_sheet(groupScores);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Scores");
+        XLSX.writeFile(workbook, "group_scores.xlsx");
+    },
+
+    // Method to get current groupScores
+    getGroupScores() {
+        return this.currentGroupScores || []; // Return current scores or empty array
     }
 };
 
@@ -350,6 +373,7 @@ const ui = {
             const selectedValue = $(this).val();
             if (selectedValue === 'all') {
                 // Update grid with data from dataArray
+                const dataArray = await fetchDataArray(); // Call fetchDataArray to get the data
                 kahoot.updateGridWithData(dataArray.map(item => ({ controller: { nickname: item.nickname }, reportData: { correctAnswersCount: item.score } })));
             } else if (selectedValue) {
                 const { kahootId, time } = JSON.parse(selectedValue);
@@ -422,9 +446,12 @@ const ui = {
                 isDPressed = false;
             }
         });
+
+        // Add event listener for download button
+        $('#download-excel').off('click').on('click', () => kahoot.downloadExcel());
     },
 
-    // Th��m phương thức mới để cập nhật lưới với dữ liệu hiện tại
+    // Update grid with current data
     updateGridWithCurrentData() {
         const selectedValue = $('#recent-results').val();
         if (selectedValue) {
@@ -476,15 +503,15 @@ async function initializeApp() {
 
     ui.updateGridLayout();
     ui.resizeGrid();
-    ui.updateFooterLayout(); // Thêm dòng này
+    ui.updateFooterLayout();
 
-    // Thêm đoạn code sau để khởi tạo fireworks
+    // Initialize fireworks
     ui.initFireworks();
 }
 
 // Run initialization when document is ready
 $(initializeApp);
 
-// Update grid with data from fetched dataArray
-const dataArray = await fetchDataArray(); // Fetch data before using it
+// Fetch data before using it
+const dataArray = await fetchDataArray(); 
 kahoot.updateGridWithData(dataArray.map(item => ({ controller: { nickname: item.nickname }, reportData: { correctAnswersCount: item.score } })));
