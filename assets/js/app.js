@@ -128,6 +128,8 @@ const kahoot = {
         // Retrieve dataArray from local storage
         const storedDataArray = JSON.parse(localStorage.getItem('dataArray')) || []; // Get dataArray from local storage
 
+        const exceptionNickname = [];
+
         // Group entities by nickname (part before ".")
         const groupedEntities = entities.reduce((groups, entity) => {
 
@@ -135,7 +137,13 @@ const kahoot = {
                 return data.map_nickname.includes(entity.controller.nickname.toUpperCase());
             });
 
-            const groupName = correspondingData?.nickname ?? entity.controller.nickname.toUpperCase();
+            const nickname = entity.controller.nickname.toUpperCase();
+
+            if(!correspondingData) {
+                exceptionNickname.push(nickname);
+            }
+
+            const groupName = correspondingData?.nickname ?? nickname;
             if(groupName) {
                 if (!groups[groupName]) {
                     groups[groupName] = [];
@@ -147,6 +155,9 @@ const kahoot = {
             }
             return groups;
         }, {});
+
+        console.error('Phát hiện những nickname không hợp lệ: ', exceptionNickname);
+
 
         const selectedValue = $('#recent-results').val(); // Get the selected value
 
