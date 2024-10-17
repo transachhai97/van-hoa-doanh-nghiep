@@ -167,7 +167,7 @@ body, html {
 }
 
 /* Refresh button styles */
-#refresh-data {
+#refresh-data, #download-excel {
     width: 40px;
     height: 40px;
     background-color: rgba(255, 255, 255, 0.1);
@@ -182,11 +182,11 @@ body, html {
     padding: 0;
 }
 
-#refresh-data:hover {
+#refresh-data:hover, #download-excel:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-#refresh-data:active {
+#refresh-data:active, #download-excel:active {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
