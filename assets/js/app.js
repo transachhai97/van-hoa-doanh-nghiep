@@ -138,13 +138,12 @@ const kahoot = {
                 return data.map_nickname.includes(nickname);
             });
 
-
-            if(!correspondingData) {
+            if (!correspondingData) {
                 exceptionNickname.push(nickname);
             }
 
             const groupName = correspondingData?.nickname;
-            if(groupName) {
+            if (groupName) {
                 if (!groups[groupName]) {
                     groups[groupName] = [];
                 }
@@ -158,6 +157,12 @@ const kahoot = {
 
         console.error('Phát hiện những nickname không hợp lệ: ', exceptionNickname);
 
+        // Find nicknames from list.json that don't exist in groups
+        const missingNicknames = storedDataArray.filter(data => 
+            !Object.keys(groupedEntities).includes(data.nickname)
+        ).map(data => data.nickname);
+
+        console.error('Những nickname từ list.json không tồn tại trong groups:', missingNicknames);
 
         const selectedValue = $('#recent-results').val(); // Get the selected value
 
@@ -186,9 +191,10 @@ const kahoot = {
         groupScores.forEach((group, index) => {
             const $gridItem = $(`#grid-item-${index}`);
             if ($gridItem.length) {
+                const isException = exceptionNickname.includes(group.groupName);
                 $gridItem.html(`
                     <div class="player-info">
-                        <p class="nickname" title="${group.groupName}">${group.groupName}</p>
+                        <p class="nickname ${isException ? 'exception-nickname' : ''}" title="${group.groupName}">${group.groupName}</p>
                         <p class="score">${group.totalScore}</p>
                     </div>
                 `);
