@@ -143,13 +143,13 @@ const kahoot = {
                 exceptionNickname.push(nickname);
             }
 
-            const groupName = correspondingData?.nickname ?? nickname;
+            const groupName = correspondingData?.nickname;
             if(groupName) {
                 if (!groups[groupName]) {
                     groups[groupName] = [];
                 }
                 groups[groupName].push({
-                    map_nickname: entity.controller.nickname.toUpperCase(),
+                    map_nickname: nickname,
                     score: entity.reportData.correctAnswersCount ?? 0,
                 });
             }
