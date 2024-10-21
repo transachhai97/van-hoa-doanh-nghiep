@@ -50,7 +50,7 @@ body, html {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: bold;
 }
 
