@@ -294,3 +294,17 @@ body, html {
 .exception-nickname {
     color: red;
 }
+
+#footer-center {
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+#footer-center.expanded {
+    white-space: normal;
+    max-height: 100px;
+    overflow-y: auto;
+}

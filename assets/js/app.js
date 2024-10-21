@@ -164,6 +164,9 @@ const kahoot = {
 
         console.error('Những nickname từ list.json không tồn tại trong groups:', missingNicknames);
 
+        // Update footer-center with missing nicknames
+        this.updateFooterWithMissingNicknames(missingNicknames);
+
         const selectedValue = $('#recent-results').val(); // Get the selected value
 
         // Calculate total score for each group
@@ -228,7 +231,18 @@ const kahoot = {
     getGroupScores() {
         console.log('download', this.currentGroupScores);
         return this.currentGroupScores || []; // Return current scores or empty array
-    }
+    },
+
+    // New method to update footer with missing nicknames
+    updateFooterWithMissingNicknames(missingNicknames) {
+        const $footerCenter = $('#footer-center');
+        if (missingNicknames.length > 0) {
+            $footerCenter.html(`${missingNicknames.join(', ')}`);
+            $footerCenter.show();
+        } else {
+            $footerCenter.hide();
+        }
+    },
 };
 
 // UI module
@@ -480,6 +494,11 @@ const ui = {
 
         // Add event listener for download button
         $('#download-excel').off('click').on('click', () => kahoot.downloadExcel());
+
+        // Add this new event listener
+        $('#footer-center').off('click').on('click', function() {
+            $(this).toggleClass('expanded');
+        });
     },
 
     // Update grid with current data
@@ -497,15 +516,18 @@ const ui = {
         const isMobile = window.innerWidth <= 768;
         const $footer = $('#footer');
         const $footerLeft = $('#footer-left');
+        const $footerCenter = $('#footer-center');
         const $controls = $('#controls');
 
         if (isMobile) {
             $footer.css('justify-content', 'center');
             $footerLeft.hide();
+            $footerCenter.css('max-width', '100%');
             $controls.css('width', '100%');
         } else {
             $footer.css('justify-content', 'space-between');
             $footerLeft.show();
+            $footerCenter.css('max-width', '33%');
             $controls.css('width', 'auto');
         }
     }
@@ -547,4 +569,3 @@ $(initializeApp);
 // Fetch data before using it
 const dataArray = await fetchDataArray(); 
 kahoot.updateGridWithData(dataArray.map(item => ({ controller: { nickname: item.nickname }, reportData: { correctAnswersCount: item.score } })));
-
