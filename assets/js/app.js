@@ -132,12 +132,12 @@ const kahoot = {
 
         // Group entities by nickname (part before ".")
         const groupedEntities = entities.reduce((groups, entity) => {
+            const nickname = entity.controller.nickname.replace(/\s+/g, '').toUpperCase();
 
             const correspondingData = storedDataArray.find(data => {
-                return data.map_nickname.includes(entity.controller.nickname.toUpperCase());
+                return data.map_nickname.includes(nickname);
             });
 
-            const nickname = entity.controller.nickname.toUpperCase();
 
             if(!correspondingData) {
                 exceptionNickname.push(nickname);
@@ -541,3 +541,4 @@ $(initializeApp);
 // Fetch data before using it
 const dataArray = await fetchDataArray(); 
 kahoot.updateGridWithData(dataArray.map(item => ({ controller: { nickname: item.nickname }, reportData: { correctAnswersCount: item.score } })));
+
